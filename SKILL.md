@@ -27,7 +27,7 @@ description: "作为项目经理操作 OpenAI Codex CLI 完全体。包含：知
 
 ## 执行模式选择
 
-启动前向涛哥确认审批模式：
+启动前向用户确认审批模式：
 
 | 模式 | 谁审批 | 适用场景 |
 |------|--------|---------|
@@ -35,9 +35,9 @@ description: "作为项目经理操作 OpenAI Codex CLI 完全体。包含：知
 | **我来审批** | 我（项目经理）判断 | 敏感操作、新项目、需要人为把关 |
 
 - **Codex 自动审批**：`--full-auto`，Codex 自行决定执行，完成后通知我检查
-- **我来审批**：默认审批策略，Codex 遇到需确认的操作会暂停，pane monitor 唤醒我，我判断批准或拒绝，涛哥不需要介入
+- **我来审批**：默认审批策略，Codex 遇到需确认的操作会暂停，pane monitor 唤醒我，我判断批准或拒绝，用户不需要介入
 
-两种模式下，**中间过程（审批、迭代、修改）都由我自主处理，涛哥只关心最终结果**。
+两种模式下，**中间过程（审批、迭代、修改）都由我自主处理，用户只关心最终结果**。
 
 ---
 
@@ -45,7 +45,7 @@ description: "作为项目经理操作 OpenAI Codex CLI 完全体。包含：知
 
 ### Step 1：理解需求
 
-- 听涛哥描述任务，理解目标和期望
+- 听用户描述任务，理解目标和期望
 - **主动追问**不清楚的细节，不猜测
 - 确认：任务目标、验收标准、涉及的项目/文件/技术栈
 
@@ -58,7 +58,7 @@ description: "作为项目经理操作 OpenAI Codex CLI 完全体。包含：知
   3. **MCP 工具**：exa 搜索、chrome 浏览器等
   4. **协作模式**：`/plan` 先分析、多智能体并行
   5. **执行模式**：exec（单次）vs TUI（多轮）
-- 与涛哥**讨论确认方案细节**，充分理清任务
+- 与用户**讨论确认方案细节**，充分理清任务
 
 ### Step 3：设计提示词
 
@@ -69,9 +69,9 @@ description: "作为项目经理操作 OpenAI Codex CLI 完全体。包含：知
 - 指定完成条件
 - 复杂任务拆分步骤
 
-### Step 4：与涛哥确认
+### Step 4：与用户确认
 
-向涛哥展示并确认：
+向用户展示并确认：
 1. **提示词内容**
 2. **工作模式**（exec vs TUI、Codex 自动审批 vs 我来审批）
 3. **配置调整**（模型/feature/skill）
@@ -154,14 +154,14 @@ tmux send-keys -t codex-<name> '3' Enter
 #### 迭代修改
 → Codex 输出不满足要求 → 在同一 TUI session 直接发后续指令 → 等下一次 hook 唤醒
 
-**原则：中间过程不打扰涛哥，我自己判断处理。**
+**原则：中间过程不打扰用户，我自己判断处理。**
 
 **兜底**（hook 长时间未触发）：
 ```bash
 tmux capture-pane -t codex-<name> -p -S -100
 ```
 
-### Step 7：向涛哥汇报
+### Step 7：向用户汇报
 
 **只在最终确认没问题后才汇报**，内容包括：
 1. 任务完成状态
@@ -169,7 +169,7 @@ tmux capture-pane -t codex-<name> -p -S -100
 3. 中间经历（如果有审批/迭代，简述过程和原因）
 4. 需要注意的事项
 
-如果中间发现**方向性问题**（任务理解有偏差、架构需要大改），则立即汇报涛哥确认，不自行决定。
+如果中间发现**方向性问题**（任务理解有偏差、架构需要大改），则立即汇报用户确认，不自行决定。
 
 ### Step 8：清理
 
@@ -185,7 +185,7 @@ bash <skill_dir>/hooks/stop_codex.sh codex-<name>
 
 1. `codex --version` 与 `state/version.txt` 不同
 2. `state/last_updated.txt` 距今超过 7 天
-3. 涛哥手动要求
+3. 用户手动要求
 
 ### 执行步骤
 
@@ -233,10 +233,10 @@ notify = ["python3", "<skill_dir>/hooks/on_complete.py"]
 ### 架构
 
 ```
-Codex 完成 turn ──→ on_complete.py ──→ 涛哥收到 🔔 Telegram
+Codex 完成 turn ──→ on_complete.py ──→ 用户收到 🔔 Telegram
                                    └──→ Agent 被唤醒（openclaw agent）
 
-Codex 等审批 ───→ pane_monitor.sh ──→ 涛哥收到 ⏸️ Telegram
+Codex 等审批 ───→ pane_monitor.sh ──→ 用户收到 ⏸️ Telegram
                                    └──→ Agent 被唤醒（openclaw agent）
 ```
 
